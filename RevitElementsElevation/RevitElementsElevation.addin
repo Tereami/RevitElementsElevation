@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">    
+    <Name>RevitElementsElevation</Name>
+    <Assembly>
+      RevitElementsElevation.dll
+    </Assembly>
+    <ClientId>5a2b702b-66e9-4e9e-9fb4-98911090c311</ClientId>
+    <FullClassName>RevitElementsElevation.App</FullClassName>
+    <VendorId>Weandrevit</VendorId>
+    <VendorDescription>weandrevit.ru</VendorDescription>
+  </AddIn>
+</RevitAddIns>
