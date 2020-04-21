@@ -171,11 +171,23 @@ namespace RevitElementsElevation
                     double baseElev = baseLevElev + baseOffset;
 
                     Level topLev = doc.GetElement(topLevelParam.AsElementId()) as Level;
-                    if (topLev == null) continue;
-                    double topLevElev = topLev.Elevation;
-                    double topOffset = topOffsetParam.AsDouble();
-
-                    double topElev = topLevElev + topOffset;
+                    double topElev = 0;
+                    if (topLev == null)
+                    {
+                        if (elem is Wall)
+                        {
+                            double heigth = elem.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM).AsDouble();
+                            topElev = baseElev + heigth;
+                        }
+                        else
+                            continue;
+                    }
+                    else
+                    {
+                        double topLevElev = topLev.Elevation;
+                        double topOffset = topOffsetParam.AsDouble();
+                        topElev = topLevElev + topOffset;
+                    }
 
                     Parameter userParamBaseElev = elem.LookupParameter(paramBottomElevName);
                     if (userParamBaseElev == null) continue;
@@ -186,8 +198,20 @@ namespace RevitElementsElevation
                     userParamTopElev.Set(topElev);
 
                     ColumnAndWallsCount++;
-                }
 
+                    //заполняю сокращенную марку
+                    Parameter shortMarkParam = elem.LookupParameter("МаркаСокращенная");
+                    if (shortMarkParam == null) continue;
+                    Parameter markParam = elem.get_Parameter(BuiltInParameter.ALL_MODEL_MARK);
+                    if (markParam == null) continue;
+                    if (!markParam.HasValue) continue;
+                    string mark = markParam.AsString();
+                    if (string.IsNullOrEmpty(mark)) continue;
+                    string[] markArray = mark.Split('-');
+                    if (markArray.Length < 3) continue;
+                    string shortMark = markArray[0] + "-" + markArray[2];
+                    shortMarkParam.Set(shortMark);
+                }
 
                 t.Commit();
             }
