@@ -43,6 +43,17 @@ namespace RevitElementsElevation
             Parameter paramElevOnLevel;
 
 
+            List<Element> ColumnsAndWalls = new FilteredElementCollector(doc)
+                .WhereElementIsNotElementType()
+                .OfClass(typeof(FamilyInstance))
+                .OfCategory(BuiltInCategory.OST_StructuralColumns)
+                .ToList();
+            ColumnsAndWalls.AddRange(new FilteredElementCollector(doc).OfClass(typeof(Wall)).ToList());
+
+            string paramBottomElevName = "Рзм.ОтметкаНиза";
+            string paramTopElevName = "Рзм.ОтметкаВерха";
+            int ColumnAndWallsCount = 0;
+
             foreach (FamilyInstance fi in fams)
             {
                 string famname = fi.Symbol.FamilyName;
@@ -76,16 +87,17 @@ namespace RevitElementsElevation
                 .First();
             double projectPointElevation = projectBasePoint.get_BoundingBox(null).Min.Z;
 
-            if (famsHoles.Count == 0)
+            using (Transaction t = new Transaction(doc))
             {
-                TaskDialog.Show("Holes elevation", "Семейства не найдены. Проверьте настройки");
-                return Result.Failed;
-            }
-            else
-            {
-                using (Transaction t = new Transaction(doc))
+                t.Start("Transaction");
+                if (famsHoles.Count == 0 && ColumnsAndWalls.Count == 0)
                 {
-                    t.Start("Transaction");
+                    TaskDialog.Show("Holes elevation", "Семейства не найдены. Проверьте настройки");
+                    return Result.Failed;
+                }
+                else
+                {
+
 
                     foreach (FamilyInstance fi in famsHoles)
                     {
@@ -105,7 +117,7 @@ namespace RevitElementsElevation
 
                             if (baseLevel == null)
                             {
-                                message += "Не удалось получить уровень для элемента " + fi.Name + " id " + fi.Id ;
+                                message += "Не удалось получить уровень для элемента " + fi.Name + " id " + fi.Id;
                                 message += " на отметке " + (point.Z * 304.8).ToString("F0");
                                 elements.Insert(fi);
                             }
@@ -118,13 +130,74 @@ namespace RevitElementsElevation
                         fi.LookupParameter(cfg.paramBaseLevel).Set(baseLevel.Elevation);
                         count++;
                     }
-                    t.Commit();
+
                 }
+
+
+                //обработка колонн и стен
+                foreach (Element elem in ColumnsAndWalls)
+                {
+                    Parameter baseLevelParam = null;
+                    Parameter baseOffsetParam = null;
+                    Parameter topLevelParam = null;
+                    Parameter topOffsetParam = null;
+
+                    if (elem is FamilyInstance)
+                    {
+                        FamilyInstance col = elem as FamilyInstance;
+                        baseLevelParam = col.get_Parameter(BuiltInParameter.SCHEDULE_BASE_LEVEL_PARAM);
+                        baseOffsetParam = col.get_Parameter(BuiltInParameter.SCHEDULE_BASE_LEVEL_OFFSET_PARAM);
+                        topLevelParam = col.get_Parameter(BuiltInParameter.SCHEDULE_TOP_LEVEL_PARAM);
+                        topOffsetParam = col.get_Parameter(BuiltInParameter.SCHEDULE_TOP_LEVEL_OFFSET_PARAM);
+                    }
+                    else if (elem is Wall)
+                    {
+                        Wall w = elem as Wall;
+                        baseLevelParam = w.get_Parameter(BuiltInParameter.WALL_BASE_CONSTRAINT);
+                        baseOffsetParam = w.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET);
+                        topLevelParam = w.get_Parameter(BuiltInParameter.WALL_HEIGHT_TYPE);
+                        topOffsetParam = w.get_Parameter(BuiltInParameter.WALL_TOP_OFFSET);
+                    }
+
+                    if (baseLevelParam == null || baseOffsetParam == null || topLevelParam == null || topOffsetParam == null)
+                    {
+                        continue;
+                    }
+
+                    Level baseLev = doc.GetElement(baseLevelParam.AsElementId()) as Level;
+                    if (baseLev == null) continue;
+                    double baseLevElev = baseLev.Elevation;
+                    double baseOffset = baseOffsetParam.AsDouble();
+                    double baseElev = baseLevElev + baseOffset;
+
+                    Level topLev = doc.GetElement(topLevelParam.AsElementId()) as Level;
+                    if (topLev == null) continue;
+                    double topLevElev = topLev.Elevation;
+                    double topOffset = topOffsetParam.AsDouble();
+
+                    double topElev = topLevElev + topOffset;
+
+                    Parameter userParamBaseElev = elem.LookupParameter(paramBottomElevName);
+                    if (userParamBaseElev == null) continue;
+                    userParamBaseElev.Set(baseElev);
+
+                    Parameter userParamTopElev = elem.LookupParameter(paramTopElevName);
+                    if (userParamTopElev == null) continue;
+                    userParamTopElev.Set(topElev);
+
+                    ColumnAndWallsCount++;
+                }
+
+
+                t.Commit();
             }
 
-            TaskDialog.Show("Holes elevation", "Найдено семейств: " + famsHoles.Count.ToString()
+            string msg = "Найдено проемов и отверстий: " + famsHoles.Count.ToString()
                 + "\nОбработано семейств: " + count
-                + "\nНе удалось обработать: " + err);
+                + "\nНе удалось обработать: " + err
+                + "\nЕще обработано колонн и стен: " + ColumnAndWallsCount;
+
+            TaskDialog.Show("Holes elevation", msg);
 
             cfg.Save();
             return Result.Succeeded;
