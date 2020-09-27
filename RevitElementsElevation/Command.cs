@@ -221,7 +221,7 @@ namespace RevitElementsElevation
                 + "\nНе удалось обработать: " + err
                 + "\nЕще обработано колонн и стен: " + ColumnAndWallsCount;
 
-            TaskDialog.Show("Holes elevation", msg);
+            BalloonTip.Show("Holes elevation", msg);
 
             cfg.Save();
             return Result.Succeeded;

@@ -39,8 +39,8 @@ namespace RevitElementsElevation
 
         public static Config Activate(bool forceShowWindow)
         {
-            string programdataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            string rbspath = Path.Combine(programdataPath, "RibbonBimStarter");
+            string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string rbspath = Path.Combine(appdataPath, "bim-starter");
             if (!Directory.Exists(rbspath)) Directory.CreateDirectory(rbspath);
             string solutionName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
             string localFolder = Path.Combine(rbspath, solutionName);
