@@ -10,12 +10,11 @@ as long as you credit the author by linking back and license your new creations 
 This code is provided 'as is'. Author disclaims any implied warranty.
 Zuev Aleksandr, 2020, all rigths reserved.*/
 #endregion
-#region Utils
+#region Usings
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using Autodesk.Revit.DB;
 #endregion
 
@@ -30,6 +29,7 @@ namespace RevitElementsElevation
         /// <returns></returns>
         public static Level GetBaseLevelofElement(FamilyInstance fi)
         {
+            Debug.WriteLine("Try to get base level for elem id: " + fi.Id.IntegerValue);
             Document doc = fi.Document;
             Level baseLevel = null;
 
@@ -39,10 +39,11 @@ namespace RevitElementsElevation
                 baseLevel = doc.GetElement(fi.LevelId) as Level;
             }
             catch { }
-            if (baseLevel != null) return baseLevel;
-
-
-
+            if (baseLevel != null)
+            {
+                Debug.WriteLine("Level is found as usual, id: " + baseLevel.Id.IntegerValue);
+                return baseLevel;
+            }
             //Для семейств "По рабочей плоскости", установленных на уровень
             try
             {
@@ -50,10 +51,12 @@ namespace RevitElementsElevation
                 baseLevel = hostElem as Level;
             }
             catch { }
-            if (baseLevel != null) return baseLevel;
-
-
-
+            if (baseLevel != null)
+            {
+                Debug.WriteLine("Level is found by host, id: " + baseLevel.Id.IntegerValue);
+                return baseLevel;
+            }
+            Debug.WriteLine("Base level is null");
             return null;
         }
 

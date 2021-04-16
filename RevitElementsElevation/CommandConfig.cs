@@ -10,6 +10,7 @@ as long as you credit the author by linking back and license your new creations 
 This code is provided 'as is'. Author disclaims any implied warranty.
 Zuev Aleksandr, 2020, all rigths reserved.*/
 #endregion
+#region usings
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+#endregion
 
 namespace RevitElementsElevation
 {
@@ -26,8 +28,12 @@ namespace RevitElementsElevation
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Config cfg = Config.Activate(true);
-            cfg.Save();
-            return Result.Succeeded;
+            if (cfg != null)
+            {
+                cfg.Save();
+                return Result.Succeeded;
+            }
+            return Result.Cancelled;
         }
     }
 }

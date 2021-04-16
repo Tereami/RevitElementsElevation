@@ -25,12 +25,21 @@ namespace RevitElementsElevation
     [Serializable]
     public class Config
     {
-        public string paramBaseLevel;
-        public string paramElevOnLevel;
 
-        public List<string> namePrefixes;
+        public string paramBaseLevel = "Рзм.ВысотаБазовогоУровня";
+        public string paramElevOnLevel = "Рзм.СмещениеОтУровня";
+
+        public bool useWallAndColumns = true;
+        public string paramBottomElevName = "Рзм.ОтметкаНиза";
+        public string paramTopElevName = "Рзм.ОтметкаВерха";
 
         private static string configPath;
+
+        public List<string> namePrefixes;
+        public void setStandardPrefixes()
+        {
+            namePrefixes = new List<string> { "230_", "231_", "232_", "235_" };
+        }
 
         public Config()
         {
@@ -60,7 +69,7 @@ namespace RevitElementsElevation
                     }
                     catch
                     {
-                        cfg = Config.GetDefault();
+                        cfg = new Config();
                     }
                     if (cfg == null)
                     {
@@ -70,7 +79,13 @@ namespace RevitElementsElevation
             }
             else
             {
-                cfg = Config.GetDefault();
+                cfg = new Config();
+            }
+
+            if (cfg != null && (cfg.namePrefixes == null || cfg.namePrefixes.Count == 0))
+            {
+                cfg.setStandardPrefixes();
+
             }
 
             if (!checkCfgFile || forceShowWindow)
@@ -84,19 +99,6 @@ namespace RevitElementsElevation
 
             return cfg;
         }
-
-
-
-        public static Config GetDefault()
-        {
-            Config es = new Config();
-            es.namePrefixes = new List<string> { "230_", "231_", "232_", "235_" };
-            es.paramBaseLevel = "Рзм.ВысотаБазовогоУровня";
-            es.paramElevOnLevel = "Рзм.СмещениеОтУровня";
-            return es;
-        }
-
-
 
         public void Save()
         {
