@@ -32,6 +32,7 @@ namespace RevitElementsElevation
         public bool useWallAndColumns = true;
         public string paramBottomElevName = "Рзм.ОтметкаНиза";
         public string paramTopElevName = "Рзм.ОтметкаВерха";
+        public bool elevIsCurrency = false;
 
         private static string configPath;
 

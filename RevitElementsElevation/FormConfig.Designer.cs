@@ -41,12 +41,13 @@
             this.textBoxTopElevParamName = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxBottomElevParamName = new System.Windows.Forms.TextBox();
+            this.checkBoxElevIsCurrency = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(121, 322);
+            this.btnOk.Location = new System.Drawing.Point(121, 357);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 1;
@@ -115,7 +116,7 @@
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.Location = new System.Drawing.Point(202, 322);
+            this.btnCancel.Location = new System.Drawing.Point(202, 357);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 2;
@@ -174,11 +175,22 @@
             this.textBoxBottomElevParamName.TabIndex = 6;
             this.textBoxBottomElevParamName.Text = "Рзм.ОтметкаНиза";
             // 
+            // checkBoxElevIsCurrency
+            // 
+            this.checkBoxElevIsCurrency.AutoSize = true;
+            this.checkBoxElevIsCurrency.Location = new System.Drawing.Point(15, 300);
+            this.checkBoxElevIsCurrency.Name = "checkBoxElevIsCurrency";
+            this.checkBoxElevIsCurrency.Size = new System.Drawing.Size(210, 17);
+            this.checkBoxElevIsCurrency.TabIndex = 7;
+            this.checkBoxElevIsCurrency.Text = "Использовать \"Денежную единицу\"";
+            this.checkBoxElevIsCurrency.UseVisualStyleBackColor = true;
+            // 
             // FormConfig
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(289, 357);
+            this.ClientSize = new System.Drawing.Size(289, 392);
+            this.Controls.Add(this.checkBoxElevIsCurrency);
             this.Controls.Add(this.textBoxBottomElevParamName);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.textBoxTopElevParamName);
@@ -218,5 +230,6 @@
         private System.Windows.Forms.TextBox textBoxTopElevParamName;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBoxBottomElevParamName;
+        private System.Windows.Forms.CheckBox checkBoxElevIsCurrency;
     }
 }

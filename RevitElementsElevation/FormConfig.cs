@@ -42,6 +42,7 @@ namespace RevitElementsElevation
             checkBoxWallAndColumns.Checked = config.useWallAndColumns;
             textBoxTopElevParamName.Text = config.paramTopElevName;
             textBoxBottomElevParamName.Text = config.paramBottomElevName;
+            checkBoxElevIsCurrency.Checked = config.elevIsCurrency;
 
             this.AcceptButton = btnOk;
             this.CancelButton = btnCancel;
@@ -62,6 +63,7 @@ namespace RevitElementsElevation
             config.useWallAndColumns = checkBoxWallAndColumns.Checked;
             config.paramTopElevName = textBoxTopElevParamName.Text;
             config.paramBottomElevName = textBoxBottomElevParamName.Text;
+            config.elevIsCurrency = checkBoxElevIsCurrency.Checked;
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

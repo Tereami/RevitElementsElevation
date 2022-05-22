@@ -209,15 +209,8 @@ namespace RevitElementsElevation
                             topElev = topLevElev + topOffset;
                         }
 
-                        Parameter userParamBaseElev = GetParameter(elem, cfg.paramBottomElevName);
-                        if (userParamBaseElev == null) continue;
-                        userParamBaseElev.Set(baseElev);
-                        Debug.WriteLine(cfg.paramBottomElevName + " = " + (baseElev * 304.8).ToString("F2"));
-
-                        Parameter userParamTopElev = GetParameter(elem, cfg.paramTopElevName);
-                        if (userParamTopElev == null) continue;
-                        userParamTopElev.Set(topElev);
-                        Debug.WriteLine(cfg.paramTopElevName + " = " + (topElev * 304.8).ToString("F2"));
+                        SetElevParamValue(elem, baseElev, cfg.paramBottomElevName, cfg);
+                        SetElevParamValue(elem, topElev, cfg.paramTopElevName, cfg);
 
                         ColumnAndWallsCount++;
                         Debug.WriteLine("Walls and columns done: " + ColumnAndWallsCount);
@@ -245,7 +238,7 @@ namespace RevitElementsElevation
                 + "\nНе удалось обработать: " + err;
             if (cfg.useWallAndColumns)
             {
-               msg += "\nЕще обработано колонн и стен: " + ColumnAndWallsCount;
+                msg += "\nЕще обработано колонн и стен: " + ColumnAndWallsCount;
             }
             Debug.WriteLine(msg);
             BalloonTip.Show("Holes elevation", msg);
@@ -271,6 +264,31 @@ namespace RevitElementsElevation
                 Debug.WriteLine("Parameter is readonly: " + paramname);
             }
             return param;
+        }
+
+        private bool SetElevParamValue(Element elem, double elevation, string paramName, Config cnf)
+        {
+            Parameter userParam = GetParameter(elem, paramName);
+            if (userParam == null)
+            {
+                Debug.WriteLine("Нет параметра " + paramName + " в элементе " + elem.Id.IntegerValue);
+                return false;
+            }
+            if (userParam.IsReadOnly)
+            {
+                Debug.WriteLine("Невозможно заполнить " + paramName + " в элементе " + elem.Id.IntegerValue);
+                return false;
+            }
+
+            double elevMm = elevation * 304.8;
+
+            if (cnf.elevIsCurrency)
+                userParam.Set(elevMm);
+            else
+                userParam.Set(elevation);
+
+            Debug.WriteLine(paramName + " = " + elevMm.ToString("F2"));
+            return true;
         }
     }
 }
