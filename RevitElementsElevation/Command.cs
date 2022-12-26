@@ -77,8 +77,7 @@ namespace RevitElementsElevation
             }
             Debug.WriteLine("Holes found: " + famsHoles.Count);
 
-            Level baseLevel = null;
-            double elev = 0;
+            
             int count = 0;
             int err = 0;
 
@@ -104,11 +103,12 @@ namespace RevitElementsElevation
                     foreach (FamilyInstance fi in famsHoles)
                     {
                         Debug.WriteLine("Current family: " + fi.Id.IntegerValue);
-                        baseLevel = LevelUtils.GetBaseLevelofElement(fi);
+                        Level baseLevel = LevelUtils.GetBaseLevel(fi);
+                        double elev = 0;
 
                         if (baseLevel != null) //обычные семейства на основе стены
                         {
-                            elev = LevelUtils.GetOffsetFromLevel(fi);
+                            elev = LevelUtils.GetOffsetFromBaseLevel(fi);
 
                         }
                         else //семейства без основы - худший вариант; у семейства нет ни уровня, ни основы. ищу ближайший уровень через координаты
@@ -124,7 +124,6 @@ namespace RevitElementsElevation
                             XYZ point = lp.Point;
                             Debug.WriteLine("Location point: " + point.ToString());
                             baseLevel = LevelUtils.GetNearestLevel(point, doc, projectPointElevation);
-
 
                             if (baseLevel == null)
                             {
@@ -150,84 +149,47 @@ namespace RevitElementsElevation
                     foreach (Element elem in ColumnsAndWalls)
                     {
                         Debug.WriteLine("Current elem id: " + elem.Id.IntegerValue);
-                        Parameter baseLevelParam = null;
-                        Parameter baseOffsetParam = null;
-                        Parameter topLevelParam = null;
-                        Parameter topOffsetParam = null;
 
-                        if (elem is FamilyInstance)
+                        Level baseLevel = LevelUtils.GetBaseLevel(elem);
+                        if (baseLevel == null)
                         {
-                            Debug.WriteLine("It is column");
-                            FamilyInstance col = elem as FamilyInstance;
-                            baseLevelParam = col.get_Parameter(BuiltInParameter.SCHEDULE_BASE_LEVEL_PARAM);
-                            baseOffsetParam = col.get_Parameter(BuiltInParameter.SCHEDULE_BASE_LEVEL_OFFSET_PARAM);
-                            topLevelParam = col.get_Parameter(BuiltInParameter.SCHEDULE_TOP_LEVEL_PARAM);
-                            topOffsetParam = col.get_Parameter(BuiltInParameter.SCHEDULE_TOP_LEVEL_OFFSET_PARAM);
-                        }
-                        else if (elem is Wall)
-                        {
-                            Debug.WriteLine("It is wall");
-                            Wall w = elem as Wall;
-                            baseLevelParam = w.get_Parameter(BuiltInParameter.WALL_BASE_CONSTRAINT);
-                            baseOffsetParam = w.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET);
-                            topLevelParam = w.get_Parameter(BuiltInParameter.WALL_HEIGHT_TYPE);
-                            topOffsetParam = w.get_Parameter(BuiltInParameter.WALL_TOP_OFFSET);
-                        }
-
-                        if (baseLevelParam == null || baseOffsetParam == null || topLevelParam == null || topOffsetParam == null)
-                        {
-                            Debug.WriteLine("Incorrect level or height parameters");
+                            Debug.WriteLine("Failed to find base level");
                             continue;
                         }
 
-                        Level baseLev = doc.GetElement(baseLevelParam.AsElementId()) as Level;
-                        if (baseLev == null)
-                        {
-                            Debug.WriteLine("No base level");
-                            continue;
-                        }
-                        double baseLevElev = baseLev.Elevation;
-                        double baseOffset = baseOffsetParam.AsDouble();
-                        double baseElev = baseLevElev + baseOffset;
+                        double baseLevElev = baseLevel.Elevation;
+                        double baseLevelOffset = LevelUtils.GetOffsetFromBaseLevel(elem);
+                        double baseElev = baseLevElev + baseLevelOffset;
+                        bool baseElevSuccess = SetElevParamValue(elem, baseElev, cfg.paramBottomElevName, cfg);
+                        if(baseElevSuccess)
+                            ColumnAndWallsCount++;
 
-                        Level topLev = doc.GetElement(topLevelParam.AsElementId()) as Level;
                         double topElev = 0;
-                        if (topLev == null)
+                        Level topLevel = LevelUtils.GetTopLevel(elem);
+                        if(topLevel != null)
                         {
-                            if (elem is Wall)
-                            {
-                                double heigth = elem.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM).AsDouble();
-                                topElev = baseElev + heigth;
-                            }
-                            else
-                                continue;
+                            double topLevElevation = topLevel.Elevation;
+                            double topOffset = LevelUtils.GetOffsetFromTopLevel(elem);
+                            topElev = topLevElevation + topOffset;
                         }
                         else
                         {
-                            double topLevElev = topLev.Elevation;
-                            double topOffset = topOffsetParam.AsDouble();
-                            topElev = topLevElev + topOffset;
+                            Debug.WriteLine("No top level, try to get height");
+                            double height = LevelUtils.GetElementHeight(elem);
+                            if(height != 0)
+                            {
+                                topElev = baseElev + height;
+                            }
+                            else
+                            {
+                                Debug.WriteLine("Failed to get top elevation");
+                                continue;
+                            }
                         }
-
-                        SetElevParamValue(elem, baseElev, cfg.paramBottomElevName, cfg);
+                        
                         SetElevParamValue(elem, topElev, cfg.paramTopElevName, cfg);
-
-                        ColumnAndWallsCount++;
-                        Debug.WriteLine("Walls and columns done: " + ColumnAndWallsCount);
-
-                        //заполняю сокращенную марку
-                        //Parameter shortMarkParam = elem.LookupParameter("МаркаСокращенная");
-                        //if (shortMarkParam == null) continue;
-                        //Parameter markParam = elem.get_Parameter(BuiltInParameter.ALL_MODEL_MARK);
-                        //if (markParam == null) continue;
-                        //if (!markParam.HasValue) continue;
-                        //string mark = markParam.AsString();
-                        //if (string.IsNullOrEmpty(mark)) continue;
-                        //string[] markArray = mark.Split('-');
-                        //if (markArray.Length < 3) continue;
-                        //string shortMark = markArray[0] + "-" + markArray[2];
-                        //shortMarkParam.Set(shortMark);
                     }
+                    Debug.WriteLine("Walls and columns done: " + ColumnAndWallsCount);
                 }
 
                 t.Commit();

@@ -27,39 +27,107 @@ namespace RevitElementsElevation
         /// </summary>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public static Level GetBaseLevelofElement(FamilyInstance fi)
+        public static Level GetBaseLevel(Element elem)
         {
-            Debug.WriteLine("Try to get base level for elem id: " + fi.Id.IntegerValue);
-            Document doc = fi.Document;
+            Debug.WriteLine("Try to get base level for elem id: " + elem.Id.IntegerValue);
+            Document doc = elem.Document;
             Level baseLevel = null;
 
             try
             {
                 //Это для обычных семейств на основе стены или уровня, у которых есть параметр "Уровень"
-                baseLevel = doc.GetElement(fi.LevelId) as Level;
+                baseLevel = doc.GetElement(elem.LevelId) as Level;
+                if (baseLevel != null)
+                {
+                    Debug.WriteLine("Level is found as LevelId, id: " + baseLevel.Id.IntegerValue);
+                    return baseLevel;
+                }
             }
             catch { }
-            if (baseLevel != null)
+
+            if (baseLevel == null)
             {
-                Debug.WriteLine("Level is found as usual, id: " + baseLevel.Id.IntegerValue);
-                return baseLevel;
+                FamilyInstance fi = elem as FamilyInstance;
+                if (fi != null)
+                {
+                    Element hostElem = fi.Host;
+                    if (hostElem != null)
+                    {
+                        if (hostElem is Level)
+                        {
+                            baseLevel = hostElem as Level;
+                        }
+                        else
+                        {
+                            Debug.WriteLine("Recursively try tp find a level by host elem, id: " + hostElem.Id.IntegerValue);
+                            baseLevel = GetBaseLevel(hostElem);
+                        }
+                        if (baseLevel != null)
+                        {
+                            Debug.WriteLine("Level is found as a host level, id: " + baseLevel.Id.IntegerValue);
+                            return baseLevel;
+                        }
+                    }
+                }
             }
-            //Для семейств "По рабочей плоскости", установленных на уровень
-            try
-            {
-                Element hostElem = fi.Host;
-                baseLevel = hostElem as Level;
-            }
-            catch { }
-            if (baseLevel != null)
-            {
-                Debug.WriteLine("Level is found by host, id: " + baseLevel.Id.IntegerValue);
-                return baseLevel;
-            }
-            Debug.WriteLine("Base level is null");
+
+            Debug.WriteLine("Try to find base level as a parameter");
+
+            List<BuiltInParameter> baseLevelParams = new List<BuiltInParameter> {
+                BuiltInParameter.LEVEL_PARAM,
+                BuiltInParameter.FAMILY_LEVEL_PARAM,
+                BuiltInParameter.FAMILY_BASE_LEVEL_PARAM,
+                BuiltInParameter.SCHEDULE_BASE_LEVEL_PARAM,
+                BuiltInParameter.SCHEDULE_LEVEL_PARAM,
+                BuiltInParameter.WALL_BASE_CONSTRAINT
+            };
+
+            baseLevel = GetLevelUsingParameters(elem, baseLevelParams);
+
+            Debug.WriteLine("Failed to find base level");
             return null;
         }
 
+
+        public static Level GetTopLevel(Element elem)
+        {
+            Document doc = elem.Document;
+
+            List<BuiltInParameter> topLevParams = new List<BuiltInParameter> {
+                BuiltInParameter.WALL_HEIGHT_TYPE,
+                BuiltInParameter.SCHEDULE_TOP_LEVEL_PARAM,
+                BuiltInParameter.FAMILY_TOP_LEVEL_PARAM
+            };
+
+            Level topLevel = GetLevelUsingParameters(elem, topLevParams);
+            return topLevel;
+        }
+
+        public static Level GetLevelUsingParameters(Element elem, List<BuiltInParameter> builtInParameters)
+        {
+            Document doc = elem.Document;
+            Level lev = null;
+            foreach (BuiltInParameter bip in builtInParameters)
+            {
+                Parameter levelParam = elem.get_Parameter(bip);
+                if (levelParam != null && levelParam.HasValue)
+                {
+                    ElementId levId = levelParam.AsElementId();
+                    if (levId != ElementId.InvalidElementId)
+                    {
+                        lev = doc.GetElement(levId) as Level;
+                        if (lev != null)
+                        {
+                            Debug.WriteLine("Level is found as " + Enum.GetName(typeof(BuiltInParameter), bip)
+                                + " level id " + lev.Id.IntegerValue);
+                            return lev;
+                        }
+                    }
+                }
+            }
+            Debug.WriteLine("Failed to find level");
+            return lev;
+        }
 
 
         /// <summary>
@@ -68,34 +136,73 @@ namespace RevitElementsElevation
         /// </summary>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public static double GetOffsetFromLevel(FamilyInstance fi)
+        public static double GetOffsetFromBaseLevel(Element elem)
         {
-            double elev = -999;
-            Parameter offsetParam = fi.get_Parameter(BuiltInParameter.INSTANCE_FREE_HOST_OFFSET_PARAM);
-            if (offsetParam != null)
+            List<BuiltInParameter> offsetParams = new List<BuiltInParameter> {
+                BuiltInParameter.INSTANCE_FREE_HOST_OFFSET_PARAM,
+                BuiltInParameter.INSTANCE_ELEVATION_PARAM,
+                BuiltInParameter.SCHEDULE_BASE_LEVEL_OFFSET_PARAM,
+                BuiltInParameter.FAMILY_BASE_LEVEL_OFFSET_PARAM,
+                BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM,
+                BuiltInParameter.WALL_BASE_OFFSET,
+                BuiltInParameter.FLOOR_HEIGHTABOVELEVEL_PARAM
+            };
+
+            double baseLevelOffset = GetDoubleUsingParameters(elem, offsetParams);
+            return baseLevelOffset;
+        }
+
+        public static double GetOffsetFromTopLevel(Element elem)
+        {
+            List<BuiltInParameter> offsetParams = new List<BuiltInParameter> {
+                BuiltInParameter.SCHEDULE_TOP_LEVEL_OFFSET_PARAM,
+                BuiltInParameter.WALL_TOP_OFFSET,
+                BuiltInParameter.FAMILY_TOP_LEVEL_OFFSET_PARAM
+            };
+
+            double topLevelOffset = GetDoubleUsingParameters(elem, offsetParams);
+            return topLevelOffset;
+        }
+
+        public static double GetElementHeight(Element elem)
+        {
+            List<BuiltInParameter> heightParams = new List<BuiltInParameter> {
+                BuiltInParameter.WALL_USER_HEIGHT_PARAM,
+                BuiltInParameter.INSTANCE_LENGTH_PARAM
+            };
+
+            double height = GetDoubleUsingParameters(elem, heightParams);
+
+            if (height == 0)
             {
-                elev = offsetParam.AsDouble();
-                if (elev != -999) return elev;
+                Guid trueLengthGuid = new Guid("b62d0a35-0f0f-432d-9d3d-e821093a7d02"); //Рзм.ДлинаБалкаИстинная
+                Parameter heightParam = elem.get_Parameter(trueLengthGuid);
+                if (heightParam != null && heightParam.HasValue)
+                {
+                    Debug.WriteLine("Get Height as a truelength parameter");
+                    height = heightParam.AsDouble();
+                }
             }
 
-            offsetParam = fi.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
-            if (offsetParam != null)
-            {
-                elev = offsetParam.AsDouble();
-                if (elev != -999) return elev;
-            }
-
-
-            if (elev == 0)
-            {
-                offsetParam = fi.get_Parameter(BuiltInParameter.INSTANCE_SILL_HEIGHT_PARAM);
-                elev = offsetParam.AsDouble();
-            }
-
-            return elev;
+            return height;
         }
 
 
+        public static double GetDoubleUsingParameters(Element elem, List<BuiltInParameter> builtInParameters)
+        {
+            Parameter param = null;
+            foreach (BuiltInParameter bip in builtInParameters)
+            {
+                param = elem.get_Parameter(bip);
+                if (param != null && param.HasValue)
+                {
+                    double elev = param.AsDouble();
+                    return elev;
+                }
+            }
+            Debug.WriteLine("Failed to find offset");
+            return 0;
+        }
 
         /// <summary>
         /// Находит ближайший снизу уровень от точки.
@@ -144,6 +251,5 @@ namespace RevitElementsElevation
 
             return finalLevel;
         }
-
     }
 }
