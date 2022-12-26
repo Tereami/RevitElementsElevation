@@ -26,12 +26,14 @@ namespace RevitElementsElevation
     public class Config
     {
 
-        public string paramBaseLevel = "Рзм.ВысотаБазовогоУровня";
-        public string paramElevOnLevel = "Рзм.СмещениеОтУровня";
+        public string paramBaseLevel = MyStrings.ParameterBaseLevelElev;
+        public string paramElevOnLevel = MyStrings.ParameterElevFromLevel;
 
         public bool useWallAndColumns = true;
-        public string paramBottomElevName = "Рзм.ОтметкаНиза";
-        public string paramTopElevName = "Рзм.ОтметкаВерха";
+
+        public string paramTopElevName = MyStrings.ParameterTopElev;
+        public string paramBottomElevName = MyStrings.ParameterBottomElev;
+        
         public bool elevIsCurrency = false;
 
         private static string configPath;
@@ -74,7 +76,7 @@ namespace RevitElementsElevation
                     }
                     if (cfg == null)
                     {
-                        throw new Exception("Не удалось сериализовать: " + configPath);
+                        throw new Exception("Failed to serialize: " + configPath);
                     }
                 }
             }

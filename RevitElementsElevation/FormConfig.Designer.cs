@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormConfig));
             this.btnOk = new System.Windows.Forms.Button();
             this.txtBoxNamePrefix = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -46,150 +47,88 @@
             // 
             // btnOk
             // 
-            this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(121, 357);
+            resources.ApplyResources(this.btnOk, "btnOk");
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(75, 23);
-            this.btnOk.TabIndex = 1;
-            this.btnOk.Text = "ОК";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             // 
             // txtBoxNamePrefix
             // 
-            this.txtBoxNamePrefix.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtBoxNamePrefix.Location = new System.Drawing.Point(15, 40);
+            resources.ApplyResources(this.txtBoxNamePrefix, "txtBoxNamePrefix");
             this.txtBoxNamePrefix.Name = "txtBoxNamePrefix";
-            this.txtBoxNamePrefix.Size = new System.Drawing.Size(262, 20);
-            this.txtBoxNamePrefix.TabIndex = 3;
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
+            resources.ApplyResources(this.label4, "label4");
             this.label4.ForeColor = System.Drawing.SystemColors.MenuText;
-            this.label4.Location = new System.Drawing.Point(12, 75);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(174, 13);
-            this.label4.TabIndex = 2;
-            this.label4.Text = "Общий параметр высоты уровня";
             // 
             // txtBoxLevelElevation
             // 
-            this.txtBoxLevelElevation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtBoxLevelElevation.Location = new System.Drawing.Point(15, 91);
+            resources.ApplyResources(this.txtBoxLevelElevation, "txtBoxLevelElevation");
             this.txtBoxLevelElevation.Name = "txtBoxLevelElevation";
-            this.txtBoxLevelElevation.Size = new System.Drawing.Size(262, 20);
-            this.txtBoxLevelElevation.TabIndex = 3;
-            this.txtBoxLevelElevation.Text = "Рзм.ВысотаБазовогоУровня";
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
+            resources.ApplyResources(this.label5, "label5");
             this.label5.ForeColor = System.Drawing.SystemColors.MenuText;
-            this.label5.Location = new System.Drawing.Point(12, 124);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(202, 13);
-            this.label5.TabIndex = 2;
-            this.label5.Text = "Общий параметр смещения от уровня";
             // 
             // txtBoxElevationFromLevel
             // 
-            this.txtBoxElevationFromLevel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtBoxElevationFromLevel.Location = new System.Drawing.Point(15, 140);
+            resources.ApplyResources(this.txtBoxElevationFromLevel, "txtBoxElevationFromLevel");
             this.txtBoxElevationFromLevel.Name = "txtBoxElevationFromLevel";
-            this.txtBoxElevationFromLevel.Size = new System.Drawing.Size(262, 20);
-            this.txtBoxElevationFromLevel.TabIndex = 3;
-            this.txtBoxElevationFromLevel.Text = "Рзм.СмещениеОтУровня";
             // 
             // label2
             // 
+            resources.ApplyResources(this.label2, "label2");
             this.label2.ForeColor = System.Drawing.SystemColors.MenuText;
-            this.label2.Location = new System.Drawing.Point(12, 11);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(262, 26);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Префикс имени семейства (точка с запятой для нескольких значений)";
             // 
             // btnCancel
             // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.Location = new System.Drawing.Point(202, 357);
+            resources.ApplyResources(this.btnCancel, "btnCancel");
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 2;
-            this.btnCancel.Text = "Отмена";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // checkBoxWallAndColumns
             // 
-            this.checkBoxWallAndColumns.AutoSize = true;
-            this.checkBoxWallAndColumns.Location = new System.Drawing.Point(15, 187);
+            resources.ApplyResources(this.checkBoxWallAndColumns, "checkBoxWallAndColumns");
             this.checkBoxWallAndColumns.Name = "checkBoxWallAndColumns";
-            this.checkBoxWallAndColumns.Size = new System.Drawing.Size(176, 17);
-            this.checkBoxWallAndColumns.TabIndex = 4;
-            this.checkBoxWallAndColumns.Text = "Обработать стены и колонны";
             this.checkBoxWallAndColumns.UseVisualStyleBackColor = true;
             this.checkBoxWallAndColumns.CheckedChanged += new System.EventHandler(this.checkBoxWallAndColumns_CheckedChanged);
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 210);
-            this.label1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 2);
+            resources.ApplyResources(this.label1, "label1");
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(138, 13);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "Параметр отметки верха:";
             // 
             // textBoxTopElevParamName
             // 
-            this.textBoxTopElevParamName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxTopElevParamName.Location = new System.Drawing.Point(15, 228);
+            resources.ApplyResources(this.textBoxTopElevParamName, "textBoxTopElevParamName");
             this.textBoxTopElevParamName.Name = "textBoxTopElevParamName";
-            this.textBoxTopElevParamName.Size = new System.Drawing.Size(262, 20);
-            this.textBoxTopElevParamName.TabIndex = 6;
-            this.textBoxTopElevParamName.Text = "Рзм.ОтметкаВерха";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 256);
-            this.label3.Margin = new System.Windows.Forms.Padding(3, 5, 3, 2);
+            resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(133, 13);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Параметр отметки низа:";
             // 
             // textBoxBottomElevParamName
             // 
-            this.textBoxBottomElevParamName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxBottomElevParamName.Location = new System.Drawing.Point(15, 274);
+            resources.ApplyResources(this.textBoxBottomElevParamName, "textBoxBottomElevParamName");
             this.textBoxBottomElevParamName.Name = "textBoxBottomElevParamName";
-            this.textBoxBottomElevParamName.Size = new System.Drawing.Size(262, 20);
-            this.textBoxBottomElevParamName.TabIndex = 6;
-            this.textBoxBottomElevParamName.Text = "Рзм.ОтметкаНиза";
             // 
             // checkBoxElevIsCurrency
             // 
-            this.checkBoxElevIsCurrency.AutoSize = true;
-            this.checkBoxElevIsCurrency.Location = new System.Drawing.Point(15, 300);
+            resources.ApplyResources(this.checkBoxElevIsCurrency, "checkBoxElevIsCurrency");
             this.checkBoxElevIsCurrency.Name = "checkBoxElevIsCurrency";
-            this.checkBoxElevIsCurrency.Size = new System.Drawing.Size(210, 17);
-            this.checkBoxElevIsCurrency.TabIndex = 7;
-            this.checkBoxElevIsCurrency.Text = "Использовать \"Денежную единицу\"";
             this.checkBoxElevIsCurrency.UseVisualStyleBackColor = true;
             // 
             // FormConfig
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(289, 392);
             this.Controls.Add(this.checkBoxElevIsCurrency);
             this.Controls.Add(this.textBoxBottomElevParamName);
             this.Controls.Add(this.label3);
@@ -206,8 +145,6 @@
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "FormConfig";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Настройки";
             this.ResumeLayout(false);
             this.PerformLayout();
 

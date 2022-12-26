@@ -36,7 +36,7 @@ namespace RevitElementsElevation
             Config cfg = Config.Activate(false);
             if (cfg == null)
             {
-                Debug.WriteLine("Unable to read config xml file");
+                Debug.WriteLine("Failed to read config xml file");
                 return Result.Cancelled;
             }
 
@@ -95,7 +95,7 @@ namespace RevitElementsElevation
                 t.Start("Transaction");
                 if (famsHoles.Count == 0 && ColumnsAndWalls.Count == 0)
                 {
-                    TaskDialog.Show("Holes elevation", "Семейства не найдены. Проверьте настройки");
+                    TaskDialog.Show("Holes elevation", MyStrings.ErrorFamiliesNotFound);
                     return Result.Failed;
                 }
                 else
@@ -113,7 +113,7 @@ namespace RevitElementsElevation
                         }
                         else //семейства без основы - худший вариант; у семейства нет ни уровня, ни основы. ищу ближайший уровень через координаты
                         {
-                            Debug.WriteLine("Family is without base level!");
+                            Debug.WriteLine("Family is has no base level!");
                             LocationPoint lp = fi.Location as LocationPoint;
                             if (lp == null)
                             {
@@ -127,9 +127,9 @@ namespace RevitElementsElevation
 
                             if (baseLevel == null)
                             {
-                                message += "Не удалось получить уровень для элемента " + fi.Name + " id " + fi.Id;
-                                message += " на отметке " + (point.Z * 304.8).ToString("F0");
-                                Debug.WriteLine("Unable to get level. " + message);
+                                message += MyStrings.ErrorNoLevel1 + fi.Name + " id " + fi.Id
+                                    + MyStrings.ErrorNoLevel2 + (point.Z * 304.8).ToString("F0");
+                                Debug.WriteLine("Failed to get level. " + message);
                                 elements.Insert(fi);
                             }
                             elev = point.Z - baseLevel.Elevation - projectPointElevation;
@@ -195,12 +195,12 @@ namespace RevitElementsElevation
                 t.Commit();
             }
 
-            string msg = "Найдено проемов и отверстий: " + famsHoles.Count.ToString()
-                + "\nОбработано семейств: " + count
-                + "\nНе удалось обработать: " + err;
+            string msg = MyStrings.MessageOpeningsFound + famsHoles.Count.ToString()
+                + "\n" + MyStrings.MessageFamiliesProceed + count.ToString()
+                + "\n" + MyStrings.MessageFamiliesNotProceed + err;
             if (cfg.useWallAndColumns)
             {
-                msg += "\nЕще обработано колонн и стен: " + ColumnAndWallsCount;
+                msg += "\n" + MyStrings.MessageWallAndColumns + ColumnAndWallsCount;
             }
             Debug.WriteLine(msg);
             BalloonTip.Show("Holes elevation", msg);
@@ -233,12 +233,12 @@ namespace RevitElementsElevation
             Parameter userParam = GetParameter(elem, paramName);
             if (userParam == null)
             {
-                Debug.WriteLine("Нет параметра " + paramName + " в элементе " + elem.Id.IntegerValue);
+                Debug.WriteLine("No parameter " + paramName + " in element " + elem.Id.IntegerValue);
                 return false;
             }
             if (userParam.IsReadOnly)
             {
-                Debug.WriteLine("Невозможно заполнить " + paramName + " в элементе " + elem.Id.IntegerValue);
+                Debug.WriteLine("Failed to write " + paramName + " in element " + elem.Id.IntegerValue);
                 return false;
             }
 
