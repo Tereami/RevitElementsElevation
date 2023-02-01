@@ -194,7 +194,7 @@ namespace RevitElementsElevation
             foreach (BuiltInParameter bip in builtInParameters)
             {
                 param = elem.get_Parameter(bip);
-                if (param != null && param.HasValue)
+                if (param != null && param.HasValue && (int)param.AsDouble() != 0)
                 {
                     double elev = param.AsDouble();
                     return elev;
