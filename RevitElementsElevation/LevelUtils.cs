@@ -22,6 +22,8 @@ namespace RevitElementsElevation
 {
     public static class LevelUtils
     {
+        public static Guid trueLengthGuid = new Guid("b62d0a35-0f0f-432d-9d3d-e821093a7d02"); //Рзм.ДлинаБалкаИстинная
+
         /// <summary>
         /// Попытаться найти уровень, к которому привязан элемент
         /// </summary>
@@ -45,7 +47,8 @@ namespace RevitElementsElevation
             }
             catch { }
 
-            if (baseLevel == null)
+            //от определения базового уровня через элемент-основу решил пока отказаться т.к. сложно определить смещение
+            /*if (baseLevel == null)
             {
                 FamilyInstance fi = elem as FamilyInstance;
                 if (fi != null)
@@ -69,7 +72,7 @@ namespace RevitElementsElevation
                         }
                     }
                 }
-            }
+            }*/
 
             Debug.WriteLine("Try to find base level as a parameter");
 
@@ -84,8 +87,9 @@ namespace RevitElementsElevation
 
             baseLevel = GetLevelUsingParameters(elem, baseLevelParams);
 
-            Debug.WriteLine("Failed to find base level");
-            return null;
+            if (baseLevel == null)
+                Debug.WriteLine($"Failed to find base level for element id {elem.Id}");
+            return baseLevel;
         }
 
 
@@ -175,7 +179,6 @@ namespace RevitElementsElevation
 
             if (height == 0)
             {
-                Guid trueLengthGuid = new Guid("b62d0a35-0f0f-432d-9d3d-e821093a7d02"); //Рзм.ДлинаБалкаИстинная
                 Parameter heightParam = elem.get_Parameter(trueLengthGuid);
                 if (heightParam != null && heightParam.HasValue)
                 {
@@ -191,16 +194,18 @@ namespace RevitElementsElevation
         public static double GetDoubleUsingParameters(Element elem, List<BuiltInParameter> builtInParameters)
         {
             Parameter param = null;
+            double tolerance = 1e-6;
+
             foreach (BuiltInParameter bip in builtInParameters)
             {
                 param = elem.get_Parameter(bip);
                 if (param != null && param.HasValue)
                 {
                     double elev = param.AsDouble();
-                    return elev;
+                    if (Math.Abs(elev) > tolerance)
+                        return elev;
                 }
             }
-            Debug.WriteLine("Failed to find offset");
             return 0;
         }
 
