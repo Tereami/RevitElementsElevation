@@ -31,7 +31,7 @@ namespace RevitElementsElevation
         /// <returns></returns>
         public static Level GetBaseLevel(Element elem)
         {
-            Debug.WriteLine("Try to get base level for elem id: " + elem.Id.IntegerValue);
+            Trace.WriteLine("Try to get base level for elem id: " + elem.Id.GetValue());
             Document doc = elem.Document;
             Level baseLevel = null;
 
@@ -41,7 +41,7 @@ namespace RevitElementsElevation
                 baseLevel = doc.GetElement(elem.LevelId) as Level;
                 if (baseLevel != null)
                 {
-                    Debug.WriteLine("Level is found as LevelId, id: " + baseLevel.Id.IntegerValue);
+                    Trace.WriteLine("Level is found as LevelId, id: " + baseLevel.Id.GetValue());
                     return baseLevel;
                 }
             }
@@ -62,19 +62,19 @@ namespace RevitElementsElevation
                         }
                         else
                         {
-                            Debug.WriteLine("Recursively try tp find a level by host elem, id: " + hostElem.Id.IntegerValue);
+                            Trace.WriteLine("Recursively try tp find a level by host elem, id: " + hostElem.Id.GetValue());
                             baseLevel = GetBaseLevel(hostElem);
                         }
                         if (baseLevel != null)
                         {
-                            Debug.WriteLine("Level is found as a host level, id: " + baseLevel.Id.IntegerValue);
+                            Trace.WriteLine("Level is found as a host level, id: " + baseLevel.Id.GetValue());
                             return baseLevel;
                         }
                     }
                 }
             }*/
 
-            Debug.WriteLine("Try to find base level as a parameter");
+            Trace.WriteLine("Try to find base level as a parameter");
 
             List<BuiltInParameter> baseLevelParams = new List<BuiltInParameter> {
                 BuiltInParameter.LEVEL_PARAM,
@@ -88,7 +88,7 @@ namespace RevitElementsElevation
             baseLevel = GetLevelUsingParameters(elem, baseLevelParams);
 
             if (baseLevel == null)
-                Debug.WriteLine($"Failed to find base level for element id {elem.Id}");
+                Trace.WriteLine($"Failed to find base level for element id {elem.Id}");
             return baseLevel;
         }
 
@@ -122,14 +122,14 @@ namespace RevitElementsElevation
                         lev = doc.GetElement(levId) as Level;
                         if (lev != null)
                         {
-                            Debug.WriteLine("Level is found as " + Enum.GetName(typeof(BuiltInParameter), bip)
-                                + " level id " + lev.Id.IntegerValue);
+                            Trace.WriteLine("Level is found as " + Enum.GetName(typeof(BuiltInParameter), bip)
+                                + " level id " + lev.Id.GetValue());
                             return lev;
                         }
                     }
                 }
             }
-            Debug.WriteLine("Failed to find level");
+            Trace.WriteLine("Failed to find level");
             return lev;
         }
 
@@ -182,7 +182,7 @@ namespace RevitElementsElevation
                 Parameter heightParam = elem.get_Parameter(trueLengthGuid);
                 if (heightParam != null && heightParam.HasValue)
                 {
-                    Debug.WriteLine("Get Height as a truelength parameter");
+                    Trace.WriteLine("Get Height as a truelength parameter");
                     height = heightParam.AsDouble();
                 }
             }

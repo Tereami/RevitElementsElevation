@@ -28,15 +28,15 @@ namespace RevitElementsElevation
     {
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            Debug.Listeners.Clear();
-            Debug.Listeners.Add(new RbsLogger.Logger("ElementsElevation"));
+            Trace.Listeners.Clear();
+            Trace.Listeners.Add(new RbsLogger.Logger("ElementsElevation"));
 
             Document doc = commandData.Application.ActiveUIDocument.Document;
 
             Config cfg = Config.Activate(false);
             if (cfg == null)
             {
-                Debug.WriteLine("Failed to read config xml file");
+                Trace.WriteLine("Failed to read config xml file");
                 return Result.Cancelled;
             }
 
@@ -50,7 +50,7 @@ namespace RevitElementsElevation
                 .OfCategory(BuiltInCategory.OST_StructuralColumns)
                 .ToList();
             ColumnsAndWalls.AddRange(new FilteredElementCollector(doc).OfClass(typeof(Wall)).ToList());
-            Debug.WriteLine("Columns and wall found: " + ColumnsAndWalls.Count);
+            Trace.WriteLine("Columns and wall found: " + ColumnsAndWalls.Count);
 
 
             int ColumnAndWallsCount = 0;
@@ -75,7 +75,7 @@ namespace RevitElementsElevation
                     }
                 }
             }
-            Debug.WriteLine("Holes found: " + famsHoles.Count);
+            Trace.WriteLine("Holes found: " + famsHoles.Count);
 
             
             int count = 0;
@@ -88,7 +88,7 @@ namespace RevitElementsElevation
                 .Where(i => i.IsShared == false)
                 .First();
             double projectPointElevation = projectBasePoint.get_BoundingBox(null).Min.Z;
-            Debug.WriteLine("Project base point elevation: " + (projectPointElevation * 304.8).ToString());
+            Trace.WriteLine("Project base point elevation: " + (projectPointElevation * 304.8).ToString());
 
             using (Transaction t = new Transaction(doc))
             {
@@ -102,7 +102,7 @@ namespace RevitElementsElevation
                 {
                     foreach (FamilyInstance fi in famsHoles)
                     {
-                        Debug.WriteLine("Current family: " + fi.Id.IntegerValue);
+                        Trace.WriteLine("Current family: " + fi.Id.GetValue());
                         Level baseLevel = LevelUtils.GetBaseLevel(fi);
                         double elev = 0;
 
@@ -113,27 +113,27 @@ namespace RevitElementsElevation
                         }
                         else //семейства без основы - худший вариант; у семейства нет ни уровня, ни основы. ищу ближайший уровень через координаты
                         {
-                            Debug.WriteLine("Family is has no base level!");
+                            Trace.WriteLine("Family is has no base level!");
                             LocationPoint lp = fi.Location as LocationPoint;
                             if (lp == null)
                             {
-                                Debug.WriteLine("No location point");
+                                Trace.WriteLine("No location point");
                                 continue;
                             }
 
                             XYZ point = lp.Point;
-                            Debug.WriteLine("Location point: " + point.ToString());
+                            Trace.WriteLine("Location point: " + point.ToString());
                             baseLevel = LevelUtils.GetNearestLevel(point, doc, projectPointElevation);
 
                             if (baseLevel == null)
                             {
                                 message += MyStrings.ErrorNoLevel1 + fi.Name + " id " + fi.Id
                                     + MyStrings.ErrorNoLevel2 + (point.Z * 304.8).ToString("F0");
-                                Debug.WriteLine("Failed to get level. " + message);
+                                Trace.WriteLine("Failed to get level. " + message);
                                 elements.Insert(fi);
                             }
                             elev = point.Z - baseLevel.Elevation - projectPointElevation;
-                            Debug.WriteLine("Nearest level id: " + baseLevel.Id.IntegerValue + ", elev: " + elev.ToString("F1"));
+                            Trace.WriteLine("Nearest level id: " + baseLevel.Id.GetValue() + ", elev: " + elev.ToString("F1"));
                         }
 
                         GetParameter(fi, cfg.paramElevOnLevel, true).Set(elev);
@@ -141,19 +141,19 @@ namespace RevitElementsElevation
                         count++;
                     }
                 }
-                Debug.WriteLine("Families done: " + count);
+                Trace.WriteLine("Families done: " + count);
 
                 if (cfg.useWallAndColumns)
                 {
-                    Debug.WriteLine("Start wall and columns processing");
+                    Trace.WriteLine("Start wall and columns processing");
                     foreach (Element elem in ColumnsAndWalls)
                     {
-                        Debug.WriteLine("Current elem id: " + elem.Id.IntegerValue);
+                        Trace.WriteLine("Current elem id: " + elem.Id.GetValue());
 
                         Level baseLevel = LevelUtils.GetBaseLevel(elem);
                         if (baseLevel == null)
                         {
-                            Debug.WriteLine("Failed to find base level");
+                            Trace.WriteLine("Failed to find base level");
                             continue;
                         }
 
@@ -174,7 +174,7 @@ namespace RevitElementsElevation
                         }
                         else
                         {
-                            Debug.WriteLine("No top level, try to get height");
+                            Trace.WriteLine("No top level, try to get height");
                             double height = LevelUtils.GetElementHeight(elem);
                             if(height != 0)
                             {
@@ -182,14 +182,14 @@ namespace RevitElementsElevation
                             }
                             else
                             {
-                                Debug.WriteLine("Failed to get top elevation");
+                                Trace.WriteLine("Failed to get top elevation");
                                 continue;
                             }
                         }
                         
                         SetElevParamValue(elem, topElev, cfg.paramTopElevName, cfg);
                     }
-                    Debug.WriteLine("Walls and columns done: " + ColumnAndWallsCount);
+                    Trace.WriteLine("Walls and columns done: " + ColumnAndWallsCount);
                 }
 
                 t.Commit();
@@ -202,7 +202,7 @@ namespace RevitElementsElevation
             {
                 msg += "\n" + MyStrings.MessageWallAndColumns + ColumnAndWallsCount;
             }
-            Debug.WriteLine(msg);
+            Trace.WriteLine(msg);
             BalloonTip.Show("Holes elevation", msg);
 
             cfg.Save();
@@ -218,12 +218,12 @@ namespace RevitElementsElevation
                 param = etype.LookupParameter(paramname);
                 if (param == null)
                 {
-                    Debug.WriteLine("No parameter: " + paramname);
+                    Trace.WriteLine("No parameter: " + paramname);
                 }
             }
             if (checkForWritable && param != null && param.IsReadOnly)
             {
-                Debug.WriteLine("Parameter is readonly: " + paramname);
+                Trace.WriteLine("Parameter is readonly: " + paramname);
             }
             return param;
         }
@@ -233,12 +233,12 @@ namespace RevitElementsElevation
             Parameter userParam = GetParameter(elem, paramName);
             if (userParam == null)
             {
-                Debug.WriteLine("No parameter " + paramName + " in element " + elem.Id.IntegerValue);
+                Trace.WriteLine("No parameter " + paramName + " in element " + elem.Id.GetValue());
                 return false;
             }
             if (userParam.IsReadOnly)
             {
-                Debug.WriteLine("Failed to write " + paramName + " in element " + elem.Id.IntegerValue);
+                Trace.WriteLine("Failed to write " + paramName + " in element " + elem.Id.GetValue());
                 return false;
             }
 
@@ -249,7 +249,7 @@ namespace RevitElementsElevation
             else
                 userParam.Set(elevation);
 
-            Debug.WriteLine(paramName + " = " + elevMm.ToString("F2"));
+            Trace.WriteLine(paramName + " = " + elevMm.ToString("F2"));
             return true;
         }
     }
