@@ -30,12 +30,10 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormConfig));
             this.btnOk = new System.Windows.Forms.Button();
-            this.txtBoxNamePrefix = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.txtBoxLevelElevation = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.txtBoxElevationFromLevel = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.btnCancel = new System.Windows.Forms.Button();
             this.checkBoxWallAndColumns = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -43,6 +41,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxBottomElevParamName = new System.Windows.Forms.TextBox();
             this.checkBoxElevIsCurrency = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnOk
@@ -51,11 +50,6 @@
             this.btnOk.Name = "btnOk";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
-            // 
-            // txtBoxNamePrefix
-            // 
-            resources.ApplyResources(this.txtBoxNamePrefix, "txtBoxNamePrefix");
-            this.txtBoxNamePrefix.Name = "txtBoxNamePrefix";
             // 
             // label4
             // 
@@ -78,12 +72,6 @@
             // 
             resources.ApplyResources(this.txtBoxElevationFromLevel, "txtBoxElevationFromLevel");
             this.txtBoxElevationFromLevel.Name = "txtBoxElevationFromLevel";
-            // 
-            // label2
-            // 
-            resources.ApplyResources(this.label2, "label2");
-            this.label2.ForeColor = System.Drawing.SystemColors.MenuText;
-            this.label2.Name = "label2";
             // 
             // btnCancel
             // 
@@ -125,10 +113,16 @@
             this.checkBoxElevIsCurrency.Name = "checkBoxElevIsCurrency";
             this.checkBoxElevIsCurrency.UseVisualStyleBackColor = true;
             // 
+            // label2
+            // 
+            resources.ApplyResources(this.label2, "label2");
+            this.label2.Name = "label2";
+            // 
             // FormConfig
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.checkBoxElevIsCurrency);
             this.Controls.Add(this.textBoxBottomElevParamName);
             this.Controls.Add(this.label3);
@@ -139,8 +133,6 @@
             this.Controls.Add(this.txtBoxLevelElevation);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.txtBoxNamePrefix);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -151,12 +143,10 @@
         }
 
         private System.Windows.Forms.Button btnOk;
-        private System.Windows.Forms.TextBox txtBoxNamePrefix;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtBoxLevelElevation;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtBoxElevationFromLevel;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnCancel;
 
 
@@ -168,5 +158,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBoxBottomElevParamName;
         private System.Windows.Forms.CheckBox checkBoxElevIsCurrency;
+        private System.Windows.Forms.Label label2;
     }
 }

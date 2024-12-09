@@ -130,9 +130,6 @@
   <data name="label5.Text" xml:space="preserve">
     <value>Общий параметр смещения от уровня</value>
   </data>
-  <data name="label2.Text" xml:space="preserve">
-    <value>Префикс имени семейства (точка с запятой для нескольких значений)</value>
-  </data>
   <data name="btnCancel.Text" xml:space="preserve">
     <value>Отмена</value>
   </data>
@@ -159,6 +156,15 @@
   </data>
   <data name="checkBoxElevIsCurrency.Text" xml:space="preserve">
     <value>Использовать "Денежную единицу"</value>
+  </data>
+  <data name="label2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 101</value>
+  </data>
+  <data name="label2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>265, 42</value>
+  </data>
+  <data name="label2.Text" xml:space="preserve">
+    <value>Плагин обработает все семейства, имеющие данные параметры (задавать префиксы, как в старой версии, больше не требуется)</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Настройки</value>

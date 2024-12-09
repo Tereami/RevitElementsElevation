@@ -12,10 +12,6 @@ Zuev Aleksandr, 2020, all rigths reserved.*/
 #endregion
 #region Usings
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Xml.Serialization;
 #endregion
@@ -33,16 +29,10 @@ namespace RevitElementsElevation
 
         public string paramTopElevName = MyStrings.ParameterTopElev;
         public string paramBottomElevName = MyStrings.ParameterBottomElev;
-        
+
         public bool elevIsCurrency = false;
 
         private static string configPath;
-
-        public List<string> namePrefixes;
-        public void setStandardPrefixes()
-        {
-            namePrefixes = new List<string> { "230_", "231_", "232_", "235_" };
-        }
 
         public Config()
         {
@@ -83,12 +73,6 @@ namespace RevitElementsElevation
             else
             {
                 cfg = new Config();
-            }
-
-            if (cfg != null && (cfg.namePrefixes == null || cfg.namePrefixes.Count == 0))
-            {
-                cfg.setStandardPrefixes();
-
             }
 
             if (!checkCfgFile || forceShowWindow)

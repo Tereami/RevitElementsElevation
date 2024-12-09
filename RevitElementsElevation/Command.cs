@@ -11,14 +11,11 @@ This code is provided 'as is'. Author disclaims any implied warranty.
 Zuev Aleksandr, 2020, all rigths reserved.*/
 #endregion
 #region Usings
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 #endregion
 
 namespace RevitElementsElevation
@@ -50,34 +47,22 @@ namespace RevitElementsElevation
                 .OfCategory(BuiltInCategory.OST_StructuralColumns)
                 .ToList();
             ColumnsAndWalls.AddRange(new FilteredElementCollector(doc).OfClass(typeof(Wall)).ToList());
-            Trace.WriteLine("Columns and wall found: " + ColumnsAndWalls.Count);
-
+            Trace.WriteLine("Columns and walls found: " + ColumnsAndWalls.Count);
 
             int ColumnAndWallsCount = 0;
 
-            Parameter paramBaseLevelElev;
-            Parameter paramElevOnLevel;
             foreach (FamilyInstance fi in fams)
             {
-                string famname = fi.Symbol.FamilyName;
-                if (string.IsNullOrEmpty(famname)) continue;
-                int prefixLength = cfg.namePrefixes.First().Length;
-                if (famname.Length <= prefixLength) continue;
-                string firstSymbols = famname.Substring(0, prefixLength);
-                if (cfg.namePrefixes.Contains(firstSymbols))
-                {
-                    paramBaseLevelElev = fi.LookupParameter(cfg.paramBaseLevel);
-                    paramElevOnLevel = fi.LookupParameter(cfg.paramElevOnLevel);
+                Parameter paramBaseLevelElev = fi.LookupParameter(cfg.paramBaseLevel);
+                Parameter paramElevOnLevel = fi.LookupParameter(cfg.paramElevOnLevel);
 
-                    if (paramBaseLevelElev != null && paramElevOnLevel != null)
-                    {
-                        famsHoles.Add(fi);
-                    }
+                if (paramBaseLevelElev != null && paramElevOnLevel != null)
+                {
+                    famsHoles.Add(fi);
                 }
             }
             Trace.WriteLine("Holes found: " + famsHoles.Count);
 
-            
             int count = 0;
             int err = 0;
 
@@ -141,7 +126,7 @@ namespace RevitElementsElevation
                         count++;
                     }
                 }
-                Trace.WriteLine("Families done: " + count);
+                Trace.WriteLine("Families found: " + count);
 
                 if (cfg.useWallAndColumns)
                 {
@@ -161,12 +146,12 @@ namespace RevitElementsElevation
                         double baseLevelOffset = LevelUtils.GetOffsetFromBaseLevel(elem);
                         double baseElev = baseLevElev + baseLevelOffset;
                         bool baseElevSuccess = SetElevParamValue(elem, baseElev, cfg.paramBottomElevName, cfg);
-                        if(baseElevSuccess)
+                        if (baseElevSuccess)
                             ColumnAndWallsCount++;
 
                         double topElev = 0;
                         Level topLevel = LevelUtils.GetTopLevel(elem);
-                        if(topLevel != null)
+                        if (topLevel != null)
                         {
                             double topLevElevation = topLevel.Elevation;
                             double topOffset = LevelUtils.GetOffsetFromTopLevel(elem);
@@ -176,7 +161,7 @@ namespace RevitElementsElevation
                         {
                             Trace.WriteLine("No top level, try to get height");
                             double height = LevelUtils.GetElementHeight(elem);
-                            if(height != 0)
+                            if (height != 0)
                             {
                                 topElev = baseElev + height;
                             }
@@ -186,7 +171,7 @@ namespace RevitElementsElevation
                                 continue;
                             }
                         }
-                        
+
                         SetElevParamValue(elem, topElev, cfg.paramTopElevName, cfg);
                     }
                     Trace.WriteLine("Walls and columns done: " + ColumnAndWallsCount);
@@ -233,12 +218,12 @@ namespace RevitElementsElevation
             Parameter userParam = GetParameter(elem, paramName);
             if (userParam == null)
             {
-                Trace.WriteLine("No parameter " + paramName + " in element " + elem.Id.GetValue());
+                Trace.WriteLine($"No parameter {paramName} in element {elem.Id}");
                 return false;
             }
             if (userParam.IsReadOnly)
             {
-                Trace.WriteLine("Failed to write " + paramName + " in element " + elem.Id.GetValue());
+                Trace.WriteLine($"Failed to write {paramName} in element {elem.Id}");
                 return false;
             }
 
